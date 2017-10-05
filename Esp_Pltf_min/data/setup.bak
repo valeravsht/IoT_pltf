@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>ESP Index</title>
+	<style>
+		body {
+			background-color: white;
+			color: black;
+		}
+	</style>
+	<script src="/jquerym.js"></script>
+
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+
+	<script type="text/javascript">
+		var xmlHttp = createXmlHttpObject();
+
+		function onBodyLoad() {
+			console.log("we are loaded!!");
+			var wifi = getWiFi1();
+			$("#macadress").val(wifi.Mac);
+			$("#ssid").val(wifi.ssid);
+			$("#password").val(wifi.password);
+			if (wifi.tip_wifi == "AP") {
+				$("#tip_wifi_ap").attr("checked", "checked");
+			} else {
+				$("#tip_wifi_cli").attr("checked", "checked")
+			}
+			if (wifi.tip_ip == "DCHP") {
+				$("#tip_ip_dchp").attr("checked", "checked");
+			} else {
+				$("#tip_ip_stat").attr("checked", "checked")
+			}
+			$("#static_ip1").val(wifi.static_ip1);
+			$("#static_ip2").val(wifi.static_ip2);
+			$("#static_ip3").val(wifi.static_ip3);
+			$("#static_ip4").val(wifi.static_ip4);
+			wifi = getWiFi2();
+
+			$("#static_mask1").val(wifi.static_mask1);
+			$("#static_mask2").val(wifi.static_mask2);
+			$("#static_mask3").val(wifi.static_mask3);
+			$("#static_mask4").val(wifi.static_mask4);
+
+			$("#static_gw1").val(wifi.static_gw1);
+			$("#static_gw2").val(wifi.static_gw2);
+			$("#static_gw3").val(wifi.static_gw3);
+			$("#static_gw4").val(wifi.static_gw4);
+
+			wifi = getWiFi3();
+
+			$("#ssidAP").val(wifi.ssidAP);
+			$("#passwordAP").val(wifi.passwordAP);
+
+			$("#staticAP_ip1").val(wifi.staticAP_ip1);
+			$("#staticAP_ip2").val(wifi.staticAP_ip2);
+			$("#staticAP_ip3").val(wifi.staticAP_ip3);
+			$("#staticAP_ip4").val(wifi.staticAP_ip4);
+
+			$("#staticAP_mask1").val(wifi.staticAP_mask1);
+			$("#staticAP_mask2").val(wifi.staticAP_mask2);
+			wifi = getWiFi4();
+			$("#staticAP_mask3").val(wifi.staticAP_mask3);
+			$("#staticAP_mask4").val(wifi.staticAP_mask4);
+
+			$("#staticAP_gw1").val(wifi.staticAP_gw1);
+			$("#staticAP_gw2").val(wifi.staticAP_gw2);
+			$("#staticAP_gw3").val(wifi.staticAP_gw3);
+			$("#staticAP_gw4").val(wifi.staticAP_gw4);
+
+			var times = getTime();
+			$("#syear").val(times.year);
+			$("#smonth").val(times.month);
+			$("#sday").val(times.day);
+			$("#shour").val(times.hour);
+			$("#sminute").val(times.minut);
+			$("#ssecond").val(times.secund);
+
+
+
+		}
+		function createXmlHttpObject() {
+			if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+			} else {
+				xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
+			}
+			return xmlHttp;
+		}
+		function getTime() {
+			xmlHttp.open("GET", "/gettime.json", false);
+			xmlHttp.send(null);
+			if (xmlHttp.status == 200) {
+				//alert(xmlHttp.responseText);
+				strJson = xmlHttp.responseText;
+			}
+			return JSON.parse(xmlHttp.responseText);
+		}
+		function settTime(submit) {
+			var param = "/stime?syear=" + val('syear') + "&smonth=" + val('smonth') + "&sday=" + val('sday') + "&shour=" + val('shour') + "&sminute=" + val('sminute') + "&ssecond=" + val('ssecond');
+			xmlHttp.open("GET", param, true);
+
+			xmlHttp.send(null);
+		}
+		function getWiFi1() {
+			xmlHttp.open("GET", "/gwifi1", false);
+			xmlHttp.send(null);
+			if (xmlHttp.status == 200) {
+				//alert(xmlHttp.responseText);
+				strJson = xmlHttp.responseText;
+			}
+			return JSON.parse(xmlHttp.responseText);
+		}
+		function getWiFi2() {
+			xmlHttp.open("GET", "/gwifi2", false);
+			xmlHttp.send(null);
+			if (xmlHttp.status == 200) {
+				//alert(xmlHttp.responseText);
+				strJson = xmlHttp.responseText;
+			}
+			return JSON.parse(xmlHttp.responseText);
+		}
+		function getWiFi3() {
+			xmlHttp.open("GET", "/gwifi3", false);
+			xmlHttp.send(null);
+			if (xmlHttp.status == 200) {
+				//alert(xmlHttp.responseText);
+				strJson = xmlHttp.responseText;
+			}
+			return JSON.parse(xmlHttp.responseText);
+		}
+		function getWiFi4() {
+			xmlHttp.open("GET", "/gwifi4", false);
+			xmlHttp.send(null);
+			if (xmlHttp.status == 200) {
+				//alert(xmlHttp.responseText);
+				strJson = xmlHttp.responseText;
+			}
+			return JSON.parse(xmlHttp.responseText);
+		}
+
+		function showTime() {
+			var times = getTime();
+			$("#curTime").val(times.year + "." + times.month + "." + times.day + "  " + times.hour + ":" + times.minut + ":" + times.secund);
+		}
+		function setWiFi1() {
+			var wifi = 0;
+			if ($("#tip_wifi_ap").prop("checked") == true) {
+				wifi = 1;
+			}
+			var dchp = 0;
+			if ($("#tip_ip_dchp").prop("checked") == true) {
+				dchp = 1;
+			}
+			$.get("/swifi1",
+				{
+					ap: wifi,
+					name: val('ssid'),
+					ps: val('password'),
+					dchp: dchp
+				});
+
+		}
+		function setWiFi2() {
+			$.get("/swifi2",
+				{
+					ip1: val('static_ip1'),
+					ip2: val('static_ip2'),
+					ip3: val('static_ip3'),
+					ip4: val('static_ip4'),
+					mask1: val('static_mask1'),
+					mask2: val('static_mask2'),
+					mask3: val('static_mask3'),
+					mask4: val('static_mask4'),
+					gw1: val('static_gw1'),
+					gw2: val('static_gw2'),
+					gw3: val('static_gw3'),
+					gw4: val('static_gw4')
+				});
+
+		}
+		function setWiFi3() {
+			$.get("/swifi3",
+				{
+					nameAP: val('ssidAP'),
+					psAP: val('passwordAP'),
+					ipAP1: val('staticAP_ip1'),
+					ipAP2: val('staticAP_ip2'),
+					ipAP3: val('staticAP_ip3'),
+					ipAP4: val('staticAP_ip4'),
+					maskAP1: val('staticAP_mask1'),
+					maskAP2: val('staticAP_mask2'),
+					maskAP3: val('staticAP_mask3'),
+					maskAP4: val('staticAP_mask4'),
+					gwAP1: val('staticAP_gw1'),
+					gwAP2: val('staticAP_gw2'),
+					gwAP3: val('staticAP_gw3'),
+					gwAP4: val('staticAP_gw4')
+				});
+
+		}
+		function settWiFi() {
+			setWiFi1();
+			setWiFi2();
+			setWiFi3();
+		}
+	
+	
+	<!--setTime(printTime(), 1000); -->
+			$(document).ready(function () {
+				//showTime();
+				setInterval('showTime()', 1000);
+			});
+
+		function val(id) {
+			var v = document.getElementById(id).value;
+			return v;
+		}
+	</script>
+
+
+</head>
+
+<body id="index" onload="onBodyLoad();">
+	<h1>ESP8266 Pin Functions</h1>
+	<p> MAC: <input id="macadress" style=" width: 150px" readonly>
+		<p>
+			<a href="/set.htm">Настройки </a>
+			<br>
+			<form name="frm_time" style="font-weight: bold;  width: 50%">
+				<fieldset>
+					<legend> Время </legend>
+					Текущие:
+					<!--  <script type="text/javascript">
+	var times = getTime();
+	document.write(times.hour + ":"+ times.minut + ":" + times.secund); 
+   </script>
+   -->
+					<input id="curTime" style=" width: 100px" readonly>
+					<fieldset>
+						<legend>Установить время</legend>
+						<input id="syear" style=" width: 50px" class="form-control" pattern="[0-9]{2}" placeholder="Год">
+						<input id="smonth" style=" width: 50px" class="form-control" pattern="[0-9]{1,2}" placeholder="Месяц">
+						<input id="sday" style=" width: 50px" pattern="[0-9]{1,2}" class="form-control" placeholder="День">
+						<br>
+						<input id="shour" style=" width: 50px" class="form-control" pattern="[0-9]{1,2}" placeholder="Часов">
+						<input id="sminute" style=" width: 50px" class="form-control" pattern="[0-9]{1,2}" placeholder="минут">
+						<input id="ssecond" style=" width: 50px" pattern="[0-9]{1,2}" pattern="[0-9]{1,2}" class="form-control" placeholder="Секунд">
+						<input class="btn btn-block btn-success" value="Сохранить" onclick="settTime(this);" type="submit">
+						<!--<hr> -->
+					</fieldset>
+				</fieldset>
+			</form>
+			<p>
+				<form id="frm_wifi" style="font-weight: bold;  width: 50%">
+					<fieldset>
+						<legend>Установки WiFi</legend>
+						<p>
+							<input name="tip_wifi" id="tip_wifi_cli" type="radio" value="wifi_client"> Подключение к существующей сети(Клиент)
+							<p>
+								<input name="tip_wifi" id="tip_wifi_ap" type="radio" value="wifi_point"> Создание точки достута
+								<p>
+
+									<fieldset>
+										<legend> Данные для клиента </legend>
+										<input id="ssid" class="form-control" placeholder="Имя точки доступа">
+										<input id="password" value="" pattern=".{8,15}" type="text" class="form-control" placeholder="Пароль">
+										<p>
+											<input name="tip_ip" id="tip_ip_dchp" type="radio" value="dhcp">DCHP
+											<p>
+												<input name="tip_ip" id="tip_ip_stat" type="radio" value="static">Статичный
+												<p>
+													IP Адрес:
+													<input id="static_ip1" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+													<input id="static_ip2" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+													<input id="static_ip3" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+													<input id="static_ip4" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">
+													<p>
+														MASK:
+														<input id="static_mask1" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+														<input id="static_mask2" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+														<input id="static_mask3" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+														<input id="static_mask4" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">
+														<p>
+															GW :
+															<input id="static_gw1" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+															<input id="static_gw2" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+															<input id="static_gw3" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+															<input id="static_gw4" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">
+															<p>
+
+									</fieldset>
+									<fieldset>
+										<legend>Данные точки доступа</legend>
+										<input id="ssidAP" class="form-control" placeholder="Имя точки доступа">
+										<input id="passwordAP" value="" pattern=".{8,15}" type="text" class="form-control" placeholder="Пароль">
+										<p>
+											IP Адрес:
+											<input id="staticAP_ip1" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+											<input id="staticAP_ip2" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+											<input id="staticAP_ip3" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+											<input id="staticAP_ip4" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">
+											<p>
+												MASK:
+												<input id="staticAP_mask1" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+												<input id="staticAP_mask2" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+												<input id="staticAP_mask3" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+												<input id="staticAP_mask4" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">
+												<p> GW :
+													<input id="staticAP_gw1" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+													<input id="staticAP_gw2" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+													<input id="staticAP_gw3" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+													<input id="staticAP_gw4" style=" width: 50px" pattern="[0-9]{1,3}" class="form-control"></p>
+												<p>&nbsp;</p>
+												<p>
+
+									</fieldset>
+
+									<fieldset>
+										<legend>MQTT</legend>
+										<p>
+											IO5 <input name="io5_rw" id="io5_r" type="checkbox" value="io5_r"> R
+											<input name="io5_rw" id="io5_w" type="checkbox" value="io5_w"> W
+											<input id="io5_mqtt" style=" width: 250px" class="form-control" size="75">
+										</p>
+										<p>
+											IO4 <input name="io4_rw" id="io4_r" type="checkbox" value="io4_r"> R
+											<input name="io4_rw" id="io4_w" type="checkbox" value="io4_w"> W
+											<input id="io4_mqtt" style=" width: 250px" class="form-control" size="75">
+										</p>
+										<p>
+											IO0 <input name="io0_rw" id="io0_r" type="checkbox" value="io0_r"> R
+											<input name="io0_rw" id="io0_w" type="checkbox" value="io0_w" disabled="disabled"> W
+											<input id="io0_mqtt" style=" width: 250px" class="form-control" size="75">
+										</p>
+
+									</fieldset>
+									<input class="btn btn-block btn-success" value="Сохранить" onclick="settWiFi();" type="submit">
+					</fieldset>
+				</form>
+				<!--<img src="pins.png" />
+
+-->
+</body>
+
+</html>
