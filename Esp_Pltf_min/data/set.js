@@ -17,6 +17,8 @@ function onBodyLoad() {
      $("#tip_wifi_ap").attr("checked", "checked");
      } else {
      $("#tip_wifi_cli").attr("checked", "checked");
+	 
+	 
      }
      if (wifi.tip_ip === "DCHP") {
      $("#tip_ip_dchp").attr("checked", "checked");
