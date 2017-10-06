@@ -36,6 +36,11 @@
 
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <Bounce2.h>
+
+
+
+
 #define ONE_WIRE_BUS 2 //18b20
 //// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
@@ -77,6 +82,16 @@ long lastMsg = 0;
 char msg[50];
 int value = 0;
 //***********************************
+
+// кнопка сброса настроек
+const int reset_buton = 0; //pin IO0
+const long reset_interval = 10000; // интервал для сброса настроек
+Bounce reset_debouncer = Bounce();
+unsigned long reset_buttonPressTimeStamp;
+
+#define LED_BOARD 15
+
+
 
 
 // WiFi
@@ -122,62 +137,25 @@ const byte dns2_1 = 8 ; //
 const byte dns2_2  = 8; //
 const byte dns2_3  = 8 ; //
 const byte dns2_4  = 8; //
-/*
-bool io5_r = false;
-bool io4_r = false;
-bool io0_r = false;
-bool io2_r = false;
-bool io15_r = false;
-bool io10_r = false;
-bool io13_r = false;
-bool io12_r = false;
-bool io14_r = false;
-bool io16_r = false;
-bool adc_r = false;
 
-bool io5_w = false;
-bool io4_w = false;
-bool io0_w = false;
-bool io2_w = false;
-bool io15_w = false;
-bool io10_w = false;
-bool io13_w = false;
-bool io12_w = false;
-bool io14_w = false;
-bool io16_w = false;
-bool adc_w = false;
-
-String io5_mqtt =  "";
-String io4_mqtt =  "";
-String io0_mqtt =  "";
-String io2_mqtt =  "";
-String io15_mqtt = "";
-String io10_mqtt = "";
-String io13_mqtt = "";
-String io12_mqtt = "";
-String io14_mqtt = "";
-String io16_mqtt = "";
-String adc_mqtt =  "";
-*/
-
-struct Set_MQTT{
+struct Set_MQTT {
   String io;
   bool r;
   bool w;
   String mqtt;
-}set_mqtt[]={
-  {"io5",false,false,""},
-  {"io4",false,false,""},
-  {"io0",false,false,""},
-  {"io2",false,false,""},
-  {"io15",false,false,""},
-  {"io9",false,false,""},
-  {"io10",false,false,""},
-  {"io13",false,false,""},
-  {"io12",false,false,""},
-  {"io14",false,false,""},
-  {"io16",false,false,""},
-  {"adc",false,false,""}
+} set_mqtt[] = {
+  {"io5", false, false, ""},
+  {"io4", false, false, ""},
+  {"io0", false, false, ""},
+  {"io2", false, false, ""},
+  {"io15", false, false, ""},
+  {"io9", false, false, ""},
+  {"io10", false, false, ""},
+  {"io13", false, false, ""},
+  {"io12", false, false, ""},
+  {"io14", false, false, ""},
+  {"io16", false, false, ""},
+  {"adc", false, false, ""}
 };
 
 void loop(void) {
@@ -190,7 +168,43 @@ void loop(void) {
   client.loop();
   //***************************
 
+  // ****  кнопка сброса настроек  *** начало
+  reset_debouncer.update();
+  if ( reset_debouncer.rose()  ) {
+    Serial.println( millis() - reset_buttonPressTimeStamp );
+    if ((millis() - reset_buttonPressTimeStamp) > reset_interval) {
+      Serial.println( "reset" );
+      defConfigFile1();
+      defConfigFile2();
+      defConfigFile3();
+      defConfigFile4();
+      defConfigMqttIO("io5");
+      defConfigMqttIO("io4");
+      defConfigMqttIO("io0");
+      defConfigMqttIO("io2");
+      defConfigMqttIO("io15");
+      defConfigMqttIO("io9");
+      defConfigMqttIO("io10");
+      defConfigMqttIO("io13");
+      defConfigMqttIO("io12");
+      defConfigMqttIO("io14");
+      defConfigMqttIO("io16");
+      defConfigMqttIO("adc");
 
+      ESP.reset();
+    }
+  }
+  if ( reset_debouncer.fell()  ) {
+    reset_buttonPressTimeStamp = millis();
+  }
+
+  int value = reset_debouncer.read();
+  if (value == LOW && (millis() - reset_buttonPressTimeStamp) > reset_interval) {
+
+    digitalWrite(LED_BOARD, HIGH );
+  }
+
+  // ****  кнопка сброса настроек *** конец
 
 
   if (flip) { // ЗАДАННЫЙ ИНТЕРВАЛ пришел
@@ -201,9 +215,11 @@ void loop(void) {
     String outTopic = outTopicMain + "/thermometer";
     client.publish(outTopic.c_str(), str.c_str());
     outTopic = outTopicMain + "/illumination";
-    int illum = map(analogRead(A0),0,1024,100,0);
+    int illum = map(analogRead(A0), 0, 1024, 100, 0);
     client.publish(outTopic.c_str(),  String(illum).c_str());
   }
+
+
 
 
   // термо датчик

@@ -581,11 +581,7 @@ int get_i_set_mqtt(String io) {
   //возвращает номер в массиве  настроек io
 
   for (int i = 0; i <= 12 ; i++ ) {
-    //    DBG_OUTPUT_PORT.println("");
-    //    DBG_OUTPUT_PORT.println("get_i_set_mqtt -" + io );
-    //    DBG_OUTPUT_PORT.print(set_mqtt[i].io);
-    //    DBG_OUTPUT_PORT.println("");
-    if (set_mqtt[i].io == io) {
+       if (set_mqtt[i].io == io) {
       return i;
     }
   }
@@ -689,17 +685,7 @@ bool saveConfigMqttIO(String io) {
   root["w"] = set_mqtt[i].w ? 1 : 0;
   root["mqtt"] = set_mqtt[i].mqtt.c_str();
 
- /* Serial.println("io-" + set_mqtt[i].io );
-  if (set_mqtt[i].r)
-    Serial.println("r-true");
-  else
-    Serial.println("r-false");
-  if (  set_mqtt[i].w)
-    Serial.println("w-true");
-  else
-    Serial.println("w-false");
-  Serial.println("mqtt-" + set_mqtt[i].mqtt );
-*/
+
   SPIFFS.remove("/cnf" + io + ".jsn");
 
   File configFile =  SPIFFS.open("/cnf" + io + ".jsn", "w");

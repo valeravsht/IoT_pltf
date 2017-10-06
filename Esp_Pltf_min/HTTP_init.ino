@@ -88,6 +88,21 @@ void gWiFi4() {
   server.send(200, "text/json", output);
 
 }
+void gWiFi5() {
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+
+  root["MQTT_Cl_Name"] = MqttClName;
+  root["MQTT_Server"] = MqttServer;
+  root["MQTT_Port"] = MqttPort;
+  root["MQTT_Login"] = MqttLogin;
+  root["MQTT_Paswd"] = MqttPaswd;
+
+  String output;
+  root.printTo(output);
+  server.send(200, "text/json", output);
+
+}
 void sWiFi1() {
 
   String message = "";
@@ -128,6 +143,7 @@ void sWiFi1() {
   saveConfig1();
   saveConfig2();
   saveConfig3();
+  saveConfig4();
   server.send(200, "text/json", "");
 
 }
@@ -197,6 +213,7 @@ void sWiFi2() {
   saveConfig1();
   saveConfig2();
   saveConfig3();
+  saveConfig4();
   server.send(200, "text/json", "");
 }
 void sWiFi3() {
@@ -271,8 +288,70 @@ void sWiFi3() {
   saveConfig1();
   saveConfig2();
   saveConfig3();
+  saveConfig4();
   server.send(200, "text/json", "");
 }
+
+void sWiFi4() {
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+
+  root["staticAP_mask3"] = staticAPMask3;
+  root["staticAP_mask4"] = staticAPMask4;
+  root["staticAP_gw1"] = staticAPGw1;
+  root["staticAP_gw2"] = staticAPGw2;
+  root["staticAP_gw3"] = staticAPGw3;
+  root["staticAP_gw4"] = staticAPGw4;
+
+  String output;
+  root.printTo(output);
+  server.send(200, "text/json", output);
+
+}
+void sWiFi5() {
+  String message = "";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+    String sName =  server.argName(i);
+    String sVal = server.arg(i);
+
+    if (sName == "MQTT_Cl_Name") {
+      MqttClName = sVal;
+      continue;
+    }
+    if (sName == "MQTT_Server") {
+      MqttServer = sVal;
+      continue;
+    }
+    if (sName == "MQTT_Port") {
+      MqttPort = sVal;
+      continue;
+    }
+    if (sName == "MQTT_Login") {
+      MqttLogin = sVal;
+      continue;
+    }
+
+    if (sName == "MQTT_Paswd") {
+      MqttPaswd = sVal;
+      continue;
+    }
+   
+    
+   
+  }
+  DBG_OUTPUT_PORT.println("");
+  DBG_OUTPUT_PORT.println("set MQTT part0 ");
+  DBG_OUTPUT_PORT.print(message);
+  DBG_OUTPUT_PORT.println("");
+  saveConfig1();
+  saveConfig2();
+  saveConfig3();
+  saveConfig4();
+  server.send(200, "text/json", "");
+}
+
+
 
 void g_io_MQTT() {
   int indx = 0;

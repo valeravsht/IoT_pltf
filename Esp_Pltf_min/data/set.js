@@ -11,70 +11,13 @@ var xmlHttp = createXmlHttpObject();
 
 function onBodyLoad() {
     console.log("we are loaded!!");
-    /* var wifi = getWiFi1();
-     $("#macadress").val(wifi.Mac);
-     $("#ssid").val(wifi.ssid);
-     $("#password").val(wifi.password);
-     if (wifi.tip_wifi === "AP") {
-     $("#tip_wifi_ap").attr("checked", "checked");
-     } else {
-     $("#tip_wifi_cli").attr("checked", "checked");
-	 
-	 
-     }
-     if (wifi.tip_ip === "DCHP") {
-     $("#tip_ip_dchp").attr("checked", "checked");
-     } else {
-     $("#tip_ip_stat").attr("checked", "checked");
-     }
-     $("#static_ip1").val(wifi.static_ip1);
-     $("#static_ip2").val(wifi.static_ip2);
-     $("#static_ip3").val(wifi.static_ip3);
-     $("#static_ip4").val(wifi.static_ip4);*/
+   
     getWiFi1();
     getWiFi2();
     getWiFi3();
     getWiFi4();
-    /*   var wifi = getWiFi2();
-     
-     $("#static_mask1").val(wifi.static_mask1);
-     $("#static_mask2").val(wifi.static_mask2);
-     $("#static_mask3").val(wifi.static_mask3);
-     $("#static_mask4").val(wifi.static_mask4);
-     
-     $("#static_gw1").val(wifi.static_gw1);
-     $("#static_gw2").val(wifi.static_gw2);
-     $("#static_gw3").val(wifi.static_gw3);
-     $("#static_gw4").val(wifi.static_gw4);
-     
-     wifi = getWiFi3();
-     
-     $("#ssidAP").val(wifi.ssidAP);
-     $("#passwordAP").val(wifi.passwordAP);
-     
-     $("#staticAP_ip1").val(wifi.staticAP_ip1);
-     $("#staticAP_ip2").val(wifi.staticAP_ip2);
-     $("#staticAP_ip3").val(wifi.staticAP_ip3);
-     $("#staticAP_ip4").val(wifi.staticAP_ip4);
-     
-     $("#staticAP_mask1").val(wifi.staticAP_mask1);
-     $("#staticAP_mask2").val(wifi.staticAP_mask2);
-     wifi = getWiFi4();
-     $("#staticAP_mask3").val(wifi.staticAP_mask3);
-     $("#staticAP_mask4").val(wifi.staticAP_mask4);
-     
-     $("#staticAP_gw1").val(wifi.staticAP_gw1);
-     $("#staticAP_gw2").val(wifi.staticAP_gw2);
-     $("#staticAP_gw3").val(wifi.staticAP_gw3);
-     $("#staticAP_gw4").val(wifi.staticAP_gw4);*/
-
-    //	var times = getTime();
-    //	$("#syear").val(times.year);
-    //	$("#smonth").val(times.month);
-    //	$("#sday").val(times.day);
-    //	$("#shour").val(times.hour);
-    //	$("#sminute").val(times.minut);
-    //	$("#ssecond").val(times.secund);
+    getWiFi5();
+    
 
     get_io("io5");
     get_io("io4");
@@ -250,20 +193,7 @@ function getWiFi3() {
     requestW3.send();
 }
 function getWiFi4() {
-    /* xmlHttp.open("GET", "/gwifi4", false);
-     xmlHttp.send(null);
-     if (xmlHttp.status === 200) {
-     //alert(xmlHttp.responseText);
-     strJson = xmlHttp.responseText;
-     }
-     return JSON.parse(xmlHttp.responseText);
-     $("#staticAP_mask3").val(wifi.staticAP_mask3);
-     $("#staticAP_mask4").val(wifi.staticAP_mask4);
-     
-     $("#staticAP_gw1").val(wifi.staticAP_gw1);
-     $("#staticAP_gw2").val(wifi.staticAP_gw2);
-     $("#staticAP_gw3").val(wifi.staticAP_gw3);
-     $("#staticAP_gw4").val(wifi.staticAP_gw4) */
+
     var requestW4 = createXmlHttpObject();
     requestW4.open("GET", "/gwifi4",false);
     requestW4.onload = function () {
@@ -286,6 +216,32 @@ function getWiFi4() {
         }
     };
     requestW4.send();
+}
+
+function getWiFi5() {
+
+    var requestW5 = createXmlHttpObject();
+    requestW5.open("GET", "/gwifi5",false);
+    requestW5.onload = function () {
+        if (requestW5.readyState === 4) {
+            var status = requestW5.status;
+            if (status === 200) {
+                let jsn = JSON.parse(requestW5.responseText);
+                var mard = document.getElementById('staticAP_mask3');
+                mard.value = jsn.staticAP_mask3;
+                document.getElementById('mqtt_cl_name').value = jsn.MQTT_Cl_Name;
+                document.getElementById('mqtt_server').value = jsn.MQTT_Server;
+                document.getElementById('mqtt_port').value = jsn.MQTT_Port;
+                document.getElementById('mqtt_login').value = jsn.MQTT_Login;
+                document.getElementById('mqtt_paswd').value = jsn.MQTT_Paswd;
+
+
+            } else {
+                document.write("Ответ сервера " + requestW5.statusText);
+            }
+        }
+    };
+    requestW5.send();
 }
 
 function showTime() {
@@ -360,23 +316,6 @@ function setWiFi2() {
     request.send();
 }
 function setWiFi3() {
-    /* $.get("/swifi3",
-     {
-     nameAP: val('ssidAP'),
-     psAP: val('passwordAP'),
-     ipAP1: val('staticAP_ip1'),
-     ipAP2: val('staticAP_ip2'),
-     ipAP3: val('staticAP_ip3'),
-     ipAP4: val('staticAP_ip4'),
-     maskAP1: val('staticAP_mask1'),
-     maskAP2: val('staticAP_mask2'),
-     maskAP3: val('staticAP_mask3'),
-     maskAP4: val('staticAP_mask4'),
-     gwAP1: val('staticAP_gw1'),
-     gwAP2: val('staticAP_gw2'),
-     gwAP3: val('staticAP_gw3'),
-     gwAP4: val('staticAP_gw4')
-     });*/
     let nameAP = val('ssidAP');
     let psAP = val('passwordAP');
     let ipAP1 = val('staticAP_ip1');
@@ -399,13 +338,29 @@ function setWiFi3() {
     let request = new XMLHttpRequest();
     request.open("GET", "/swifi3?" + par + par1 + par2,false);
     request.send();
-
-
 }
+
+function setWiFi4() {
+    let mqtt_cl_name = val('mqtt_cl_name');
+    let mqtt_server = val('mqtt_server');
+    let mqtt_port = val('mqtt_port');
+    let mqtt_login = val('mqtt_login');
+    let MQTT_Paswd = val('mqtt_paswd');
+    
+
+    let par = `MQTT_Cl_Name=${mqtt_cl_name}&MQTT_Server=${mqtt_server}&`;
+    let par1 = `MQTT_Port=${mqtt_port}&MQTT_Login=${mqtt_login}&MQTT_Paswd=${MQTT_Paswd}`;
+   
+    let request = new XMLHttpRequest();
+    request.open("GET", "/swifi4?" + par + par1 ,false);
+    request.send();
+}
+
 function settWiFi() {
     setWiFi1();
     setWiFi2();
     setWiFi3();
+    setWiFi4();
     set_all_io();
 }
 

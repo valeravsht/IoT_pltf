@@ -108,9 +108,29 @@
                     <p>
 
                 </fieldset>
-
+                
                 <fieldset>
-                    <legend>MQTT</legend>
+                    <legend>Данные MQTT сервера</legend>
+                    <p>
+                    Имя клиента MQTT :
+                    <input id="mqtt_cl_name" class= "form-control" > </p>
+                    <p>
+                    Имя сервера MQTT :   
+                    <input id="mqtt_server"  type="text" class="form-control" > </p>
+                      <p>
+                    Порт сервера MQTT :   
+                    <input id="mqtt_port" type="text" class="form-control" ></p>
+                     <p>
+                    Login сервера MQTT :   
+                    <input id="mqtt_login" type="text" class="form-control" ></p>
+                    <p>
+                    Pasword сервера MQTT :   
+                    <input id="mqtt_paswd"  type="text" class="form-control" ></p>
+             
+
+                  </fieldset>    
+                <fieldset>
+                    <legend>Данные MQTT IO</legend>
                     <p>
                         IO5 <input name="io5_rw" id="io5_r" type="checkbox" value="io5_r" onclick="io_rw(this)"> R
                         <input name="io5_rw" id="io5_w" type="checkbox" value="io5_w" onclick="io_rw(this)" > W

@@ -5,6 +5,18 @@ void setup(void) {
   DBG_OUTPUT_PORT.setDebugOutput(true);
   DBG_OUTPUT_PORT.print("macAddress -  ");
   DBG_OUTPUT_PORT.println(WiFi.macAddress());
+
+  // кнопка сброса настроек
+  pinMode(reset_buton, INPUT);
+  reset_debouncer.attach(reset_buton);
+  reset_debouncer.interval(5);
+
+
+  //светодид на плате
+  pinMode(LED_BOARD, OUTPUT);
+  digitalWrite(LED_BOARD, LOW );
+  
+
   SPIFFS.begin();
   {
     Dir dir = SPIFFS.openDir("/");
@@ -31,9 +43,9 @@ void setup(void) {
     //  DBG_OUTPUT_PORT.println("Load Config 3 - BAD!!!!");
   }
   if (loadConfig4()) {
-  //  DBG_OUTPUT_PORT.println("Load Config 4 - OK");
+     DBG_OUTPUT_PORT.println("Load Config 4 - OK");
   } else {
-     DBG_OUTPUT_PORT.println("Load Config 4 - BAD!!!!");
+  //  DBG_OUTPUT_PORT.println("Load Config 4 - BAD!!!!");
   }
 
   loadConfigMqttIO("io5");
@@ -48,6 +60,8 @@ void setup(void) {
   loadConfigMqttIO("io14");
   loadConfigMqttIO("io16");
   loadConfigMqttIO("adc");
+
+  
   if (wifi_AP) {
     Serial.println();
     Serial.print("Configuring access point...");
@@ -90,7 +104,7 @@ void setup(void) {
     if (i == 21) {
       DBG_OUTPUT_PORT.print("Could not connect to");
       DBG_OUTPUT_PORT.println(ssid);
-      while (1) delay(500); 
+      while (1) delay(500);
     }
     DBG_OUTPUT_PORT.print("Connected! IP address: ");
     DBG_OUTPUT_PORT.println(WiFi.localIP());
@@ -145,9 +159,11 @@ void setup(void) {
   server.on("/gwifi2", gWiFi2);
   server.on("/gwifi3", gWiFi3);
   server.on("/gwifi4", gWiFi4);
+   server.on("/gwifi5", gWiFi5);
   server.on("/swifi1",  sWiFi1);
   server.on("/swifi2",  sWiFi2);
   server.on("/swifi3",  sWiFi3);
+    server.on("/swifi4",  sWiFi4);
   server.on("/gio", g_io_MQTT);
   server.on("/sio", HTTP_GET, sMqtt);
 
