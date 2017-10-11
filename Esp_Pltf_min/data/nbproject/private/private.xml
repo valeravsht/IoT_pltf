@@ -4,7 +4,12 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/D:/YandexDisk/arduino/PROJECT/IoT/IoT_pltf/Esp_Pltf_min/data/set.js</file>
+            <file>file:/D:/YandexDisk/arduino/PROJECT/IoT/IoT_pltf/Esp_Pltf_min/data/set_io_mqtt.htm</file>
+            <file>file:/D:/YandexDisk/arduino/PROJECT/IoT/IoT_pltf/Esp_Pltf_min/data/set_mqtt_serv.htm</file>
             <file>file:/D:/YandexDisk/arduino/PROJECT/IoT/IoT_pltf/Esp_Pltf_min/data/setup.htm</file>
+            <file>file:/D:/YandexDisk/arduino/PROJECT/IoT/IoT_pltf/Esp_Pltf_min/data/set_ap_wifi.htm</file>
+            <file>file:/D:/YandexDisk/arduino/PROJECT/IoT/IoT_pltf/Esp_Pltf_min/data/index.htm</file>
+            <file>file:/D:/YandexDisk/arduino/PROJECT/IoT/IoT_pltf/Esp_Pltf_min/data/set_cl_wifi.htm</file>
         </group>
     </open-files>
 </project-private>

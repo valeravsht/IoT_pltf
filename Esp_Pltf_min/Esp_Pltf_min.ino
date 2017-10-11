@@ -29,11 +29,8 @@
 #include <FS.h>
 #include <Wire.h>
 #include <ArduinoJson.h>
-
 #include <PubSubClient.h> //MQTT
-
 #include <Ticker.h>
-
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <Bounce2.h>
@@ -74,6 +71,9 @@ static String MqttServer = ""; //сервер брокера MQTT
 static String MqttPort = ""; // порт брокера MQTT
 static String MqttLogin = "";
 static String MqttPaswd = "";
+bool mqtt_connect = false;
+const int mqtt_timeout = 5000; // пауза на подключение
+long mqtt_offline; // время потери подключения
 
 
 WiFiClient espClient;
@@ -99,7 +99,8 @@ String ssid = ""; //имя точки доступа для подключени
 String password = ""; // пароль для подключения (режим клиент)
 boolean ipDCHP = true; // получение IP адреса по DCHP
 
-boolean wifi_AP = true; // режимы wifi  false-клиент, true-точка доступа
+boolean wifi_AP = true; // режимы wifi  точка доступа
+boolean wifi_Cl = false; // режимы wifi клиент
 String ssidAP = ""; // имя для точки доступа (режим точка доступа)
 String passwordAP = ""; // пароль для точки доступа (режим точка доступа)
 byte staticIP1 ; // статический IP
@@ -163,7 +164,14 @@ void loop(void) {
 
   // ********* MQTT **************
   if (!client.connected()) {
-    reconnect();
+    // попытка подкючения с заданным интервалом
+    if ((millis() - mqtt_offline) > mqtt_timeout) {
+       DBG_OUTPUT_PORT.println("conect mqtt");
+      reconnect(); //
+      mqtt_offline = millis();
+    }
+  } else {
+    mqtt_offline = millis();
   }
   client.loop();
   //***************************
@@ -174,10 +182,10 @@ void loop(void) {
     Serial.println( millis() - reset_buttonPressTimeStamp );
     if ((millis() - reset_buttonPressTimeStamp) > reset_interval) {
       Serial.println( "reset" );
-      defConfigFile1();
-      defConfigFile2();
-      defConfigFile3();
-      defConfigFile4();
+      defConfigWiFiCl1();
+      defConfigWiFiCl2();
+      defConfigAP();
+      defConfigServMQTT();
       defConfigMqttIO("io5");
       defConfigMqttIO("io4");
       defConfigMqttIO("io0");

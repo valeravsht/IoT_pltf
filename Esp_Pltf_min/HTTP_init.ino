@@ -5,16 +5,17 @@ void testpp() {
 }
 
 
-void gWiFi1() {
+void gWiFiCl1() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   root["Mac"] = WiFi.macAddress();
-  if (wifi_AP) {
-    root["tip_wifi"] = "AP"; //точка доступа
-  } else
-  {
-    root["tip_wifi"] = "Client"; //точка доступа
+
+  if (wifi_Cl) {
+    root["wifi_Cl"] = 1; //точка доступа
+  } else {
+    root["wifi_Cl"] = 0; //точка доступа
   }
+
   root["ssid"] = ssid;
   root["password"] = password;
   if (ipDCHP) {
@@ -32,7 +33,7 @@ void gWiFi1() {
   server.send(200, "text/json", output);
 
 }
-void gWiFi2() {
+void gWiFiCl2() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
@@ -52,10 +53,14 @@ void gWiFi2() {
 
 }
 
-void gWiFi3() {
+void gWiFiAp1() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
-
+  if (wifi_AP) {
+    root["wifi_AP"] = 1; //точка доступа
+  } else {
+    root["wifi_AP"] = 0; //точка доступа
+  }
 
   root["ssidAP"] = ssidAP;
   root["passwordAP"] = passwordAP;
@@ -72,7 +77,7 @@ void gWiFi3() {
   server.send(200, "text/json", output);
 
 }
-void gWiFi4() {
+void gWiFiAP2() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
@@ -88,7 +93,7 @@ void gWiFi4() {
   server.send(200, "text/json", output);
 
 }
-void gWiFi5() {
+void gServMQTT() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
@@ -103,7 +108,7 @@ void gWiFi5() {
   server.send(200, "text/json", output);
 
 }
-void sWiFi1() {
+void sWiFiCl1() {
 
   String message = "";
   for (uint8_t i = 0; i < server.args(); i++) {
@@ -111,11 +116,11 @@ void sWiFi1() {
     String sName =  server.argName(i);
     String sVal = server.arg(i);
 
-    if (sName == "ap") {
+    if (sName == "wifi_cl") {
       if ( sVal == "1" ) {
-        wifi_AP = true;
+        wifi_Cl = true;
       } else {
-        wifi_AP = false;
+        wifi_Cl = false;
       }
       continue;
     }
@@ -140,14 +145,13 @@ void sWiFi1() {
   DBG_OUTPUT_PORT.println("set WIFI part1 ");
   DBG_OUTPUT_PORT.print(message);
   DBG_OUTPUT_PORT.println("");
-  saveConfig1();
-  saveConfig2();
-  saveConfig3();
-  saveConfig4();
+  
+  saveConfigWiFiCl1();
+  
   server.send(200, "text/json", "");
 
 }
-void sWiFi2() {
+void sWiFiCl2() {
   String message = "";
   for (uint8_t i = 0; i < server.args(); i++) {
     message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
@@ -210,18 +214,26 @@ void sWiFi2() {
   DBG_OUTPUT_PORT.println("set WIFI part2 ");
   DBG_OUTPUT_PORT.print(message);
   DBG_OUTPUT_PORT.println("");
-  saveConfig1();
-  saveConfig2();
-  saveConfig3();
-  saveConfig4();
+ 
+  saveConfigWiFiCl2();
+  
   server.send(200, "text/json", "");
 }
-void sWiFi3() {
+void sWiFiAP() {
   String message = "";
   for (uint8_t i = 0; i < server.args(); i++) {
     message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
     String sName =  server.argName(i);
     String sVal = server.arg(i);
+
+    if (sName == "wifi_ap") {
+      if ( sVal == "1" ) {
+        wifi_AP = true;
+      } else {
+        wifi_AP = false;
+      }
+      continue;
+    }
 
     if (sName == "ipAP1") {
       staticAPIP1 = (byte)sVal.toInt();
@@ -285,14 +297,12 @@ void sWiFi3() {
   DBG_OUTPUT_PORT.println("set WIFI part3 ");
   DBG_OUTPUT_PORT.print(message);
   DBG_OUTPUT_PORT.println("");
-  saveConfig1();
-  saveConfig2();
-  saveConfig3();
-  saveConfig4();
+  saveConfigAP();
+  
   server.send(200, "text/json", "");
 }
-
-void sWiFi4() {
+/*
+void sServMQTT() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
@@ -306,9 +316,13 @@ void sWiFi4() {
   String output;
   root.printTo(output);
   server.send(200, "text/json", output);
+  saveConfig1();
+  saveConfig2();
+  saveConfig3();
+  saveConfig4();
 
-}
-void sWiFi5() {
+}*/
+void sServMQTT() {
   String message = "";
   for (uint8_t i = 0; i < server.args(); i++) {
     message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
@@ -336,19 +350,19 @@ void sWiFi5() {
       MqttPaswd = sVal;
       continue;
     }
-   
-    
-   
+
+
+
   }
   DBG_OUTPUT_PORT.println("");
   DBG_OUTPUT_PORT.println("set MQTT part0 ");
   DBG_OUTPUT_PORT.print(message);
   DBG_OUTPUT_PORT.println("");
-  saveConfig1();
-  saveConfig2();
-  saveConfig3();
-  saveConfig4();
+
   server.send(200, "text/json", "");
+
+  saveConfigServMQTT();
+  
 }
 
 
@@ -399,23 +413,23 @@ void sMqtt() {
 
     if (sName == "io") {
       io = sVal;
- //      DBG_OUTPUT_PORT.println("io -> " +sVal );
+      //      DBG_OUTPUT_PORT.println("io -> " +sVal );
       continue;
     }
 
     if (sName == "r") {
       io_r = sVal;
-  //       DBG_OUTPUT_PORT.println("r -> " +sVal );
+      //       DBG_OUTPUT_PORT.println("r -> " +sVal );
       continue;
     }
     if (sName == "w") {
       io_w = sVal;
-  //       DBG_OUTPUT_PORT.println("w -> " +sVal );
+      //       DBG_OUTPUT_PORT.println("w -> " +sVal );
       continue;
     }
     if (sName == "mqtt") {
       io_mqtt = sVal;
-//       DBG_OUTPUT_PORT.println("mqtt -> " +sVal );
+      //       DBG_OUTPUT_PORT.println("mqtt -> " +sVal );
       continue;
     }
 
@@ -423,17 +437,17 @@ void sMqtt() {
   int indx = get_i_set_mqtt(io);
   if (io_r == "true") {
     set_mqtt[indx].r = true;
- //    Serial.println("r=true");
+    //    Serial.println("r=true");
   } else {
     set_mqtt[indx].r = false;
-  //   Serial.println("r=false");
+    //   Serial.println("r=false");
   }
   if (io_w == "true") {
     set_mqtt[indx].w = true;
-//Serial.println("w=true");
+    //Serial.println("w=true");
   } else {
     set_mqtt[indx].w = false;
- //     Serial.println("w=false");
+    //     Serial.println("w=false");
   }
   set_mqtt[indx].mqtt = io_mqtt;
 
@@ -447,5 +461,17 @@ void sMqtt() {
   ;
 }
 
+
+
+void gSta() {
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["Mac"] = WiFi.macAddress();
+
+  String output;
+  root.printTo(output);
+  server.send(200, "text/json", output);
+
+}
 
 

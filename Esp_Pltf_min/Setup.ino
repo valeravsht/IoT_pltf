@@ -15,7 +15,7 @@ void setup(void) {
   //светодид на плате
   pinMode(LED_BOARD, OUTPUT);
   digitalWrite(LED_BOARD, LOW );
-  
+
 
   SPIFFS.begin();
   {
@@ -27,27 +27,10 @@ void setup(void) {
     }
     DBG_OUTPUT_PORT.printf("\n");
   }
-  if (loadConfig1()) {
-    //  DBG_OUTPUT_PORT.println("Load Config 1 - OK");
-  } else {
-    //  DBG_OUTPUT_PORT.println("Load Config 1 - BAD!!!!");
-  }
-  if (loadConfig2()) {
-    //  DBG_OUTPUT_PORT.println("Load Config 2 - OK");
-  } else {
-    // DBG_OUTPUT_PORT.println("Load Config 2 - BAD!!!!");
-  }
-  if (loadConfig3()) {
-    // DBG_OUTPUT_PORT.println("Load Config 3 - OK");
-  } else {
-    //  DBG_OUTPUT_PORT.println("Load Config 3 - BAD!!!!");
-  }
-  if (loadConfig4()) {
-     DBG_OUTPUT_PORT.println("Load Config 4 - OK");
-  } else {
-  //  DBG_OUTPUT_PORT.println("Load Config 4 - BAD!!!!");
-  }
-
+  loadConfigWiFiCl1();
+  loadConfigWiFiCl2();
+  loadConfigAP();
+  loadConfigServMQTT();
   loadConfigMqttIO("io5");
   loadConfigMqttIO("io4");
   loadConfigMqttIO("io0");
@@ -61,7 +44,7 @@ void setup(void) {
   loadConfigMqttIO("io16");
   loadConfigMqttIO("adc");
 
-  
+
   if (wifi_AP) {
     Serial.println();
     Serial.print("Configuring access point...");
@@ -155,17 +138,18 @@ void setup(void) {
   }, handleFileUpload);
 
 
-  server.on("/gwifi1", gWiFi1);
-  server.on("/gwifi2", gWiFi2);
-  server.on("/gwifi3", gWiFi3);
-  server.on("/gwifi4", gWiFi4);
-   server.on("/gwifi5", gWiFi5);
-  server.on("/swifi1",  sWiFi1);
-  server.on("/swifi2",  sWiFi2);
-  server.on("/swifi3",  sWiFi3);
-    server.on("/swifi4",  sWiFi4);
+  server.on("/gwificl1", gWiFiCl1);
+  server.on("/gwificl2", gWiFiCl2);
+  server.on("/gwifiap1", gWiFiAp1);
+  server.on("/gwifiap2", gWiFiAP2);
+  server.on("/gservmqtt", gServMQTT);
+  server.on("/swificl1",  sWiFiCl1);
+  server.on("/swificl2",  sWiFiCl2);
+  server.on("/swifiap",  sWiFiAP);
+  server.on("/sservmqtt",  sServMQTT);
   server.on("/gio", g_io_MQTT);
   server.on("/sio", HTTP_GET, sMqtt);
+  server.on("/get_sta", HTTP_GET, gSta);
 
 
 

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="style.css" type="text/css"/>
+
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>ESP Index</title>
+        <style>
+            body {
+                background-color: white;
+                color: black;
+            }
+        </style>
+        <!--   <script src="jquerym.js"></script>-->
+        <script src="set.js"></script>
+
+        <script type="text/javascript">
+
+            var xmlHttp = createXmlHttpObject();
+
+            function onBodyLoad() {
+                console.log("we are loaded!!");
+                getWiFi1();
+                getWiFi2();
+            }
+
+            function createXmlHttpObject() {
+                if (window.XMLHttpRequest) {
+                    xmlHttp = new XMLHttpRequest();
+                } else {
+                    xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
+                }
+                return xmlHttp;
+            }
+
+            function getWiFi1() {
+                var requestW1 = createXmlHttpObject();
+
+                function responceLoad() {
+                    if (requestW1.readyState === 4) {
+                        var status = requestW1.status;
+                        if (status === 200) {
+                            let jsn = JSON.parse(requestW1.responseText);
+                            //                    var mard = document.getElementById('macadress');
+                            //                   mard.value = jsn.Mac;
+                            document.getElementById('ssid').value = jsn.ssid;
+                            document.getElementById('password').value = jsn.password;
+                            if (jsn.wifi_Cl === 1) {
+                                document.getElementById('tip_wifi_cli').checked = true;
+                            } else {
+                                document.getElementById('tip_wifi_cli').checked = false;
+                            }
+                            if (jsn.tip_ip === "DCHP") {
+                                document.getElementById('tip_ip_dchp').checked = true;
+                            } else {
+                                document.getElementById('tip_ip_stat').checked = true;
+                            }
+                            document.getElementById('static_ip1').value = jsn.static_ip1;
+                            document.getElementById('static_ip2').value = jsn.static_ip2;
+                            document.getElementById('static_ip3').value = jsn.static_ip3;
+                            document.getElementById('static_ip4').value = jsn.static_ip4;
+
+                        } else {
+                            document.write("Ответ сервера " + request.statusText);
+                        }
+                    }
+                }
+
+                requestW1.open("GET", "/gwificl1", false);
+                requestW1.onload = responceLoad;
+                requestW1.send();
+            }
+
+            function getWiFi2() {
+                var requestW2 = createXmlHttpObject();
+                requestW2.open("GET", "/gwificl2", false);
+                requestW2.onload = function () {
+                    if (requestW2.readyState === 4) {
+                        var status = requestW2.status;
+                        if (status === 200) {
+                            let jsn = JSON.parse(requestW2.responseText);
+                            var mard = document.getElementById('static_mask1');
+                            mard.value = jsn.static_mask1;
+                            document.getElementById('static_mask2').value = jsn.static_mask2;
+                            document.getElementById('static_mask3').value = jsn.static_mask3;
+                            document.getElementById('static_mask4').value = jsn.static_mask4;
+                            document.getElementById('static_gw1').value = jsn.static_gw1;
+                            document.getElementById('static_gw2').value = jsn.static_gw2;
+                            document.getElementById('static_gw3').value = jsn.static_gw3;
+                            document.getElementById('static_gw4').value = jsn.static_gw4;
+
+                        } else {
+                            document.write("Ответ сервера " + requestW2.statusText);
+                        }
+                    }
+                };
+                requestW2.send();
+            }
+
+            function setWiFiCl1() {
+                var wifi_cl = 0; //
+                if (document.getElementById('tip_wifi_cli').checked === true) {
+                    wifi_cl = 1;
+                }
+
+                var dchp = 0;
+                if (document.getElementById('tip_ip_dchp').checked === true) {
+                    dchp = 1;
+                }
+
+                let ssid = val('ssid');
+                let ps = val('password');
+                let par = `wifi_cl=${wifi_cl}&name=${ssid}&ps=${ps}&dchp=${dchp}`;
+                let requestw1 = new XMLHttpRequest();
+                requestw1.open("GET", "/swificl1?" + par, false);
+
+                requestw1.send();
+
+            }
+            function setWiFiCl2() {
+
+                let ip1 = val('static_ip1');
+                let ip2 = val('static_ip2');
+                let ip3 = val('static_ip3');
+                let ip4 = val('static_ip4');
+                let mask1 = val('static_mask1');
+                let mask2 = val('static_mask2');
+                let mask3 = val('static_mask3');
+                let mask4 = val('static_mask4');
+                let gw1 = val('static_gw1');
+                let gw2 = val('static_gw2');
+                let gw3 = val('static_gw3');
+                let gw4 = val('static_gw4');
+
+                let par = `ip1=${ip1}&ip2=${ip2}&ip3=${ip3}&ip4=${ip4}$mask1=${mask1}&mask2=${mask2}&`;
+                let par1 = `mask3=${mask3}&mask4=${mask4}&gw1=${gw1}&gw2=${gw2}&gw3=${gw3}&gw4=${gw4}`;
+                let request = new XMLHttpRequest();
+                request.open("GET", "/swificl2?" + par + par1, false);
+                request.send();
+            }
+
+            function settWiFiCl() {
+                setWiFiCl1();
+                setWiFiCl2();
+            }
+            function val(id) {
+                var v = document.getElementById(id).value;
+                return v;
+            }
+
+        </script>
+
+    </head>
+
+    <body id="index" onload="onBodyLoad();">
+        <h1>ESP8266</h1>
+        
+        <form id="frm_wifi" style="font-weight: bold;  width: 50%">
+            <fieldset>
+                <legend>Установки WiFi</legend>
+                <p>
+                    <input name="tip_wifi" id="tip_wifi_cli" type="checkbox" value="wifi_client"> Подключение к существующей сети(Клиент)
+
+                <p>
+
+                <fieldset>
+                    <legend> Данные для клиента </legend>
+                    <input id="ssid" class="form-control" placeholder="Имя точки доступа">
+                    <input id="password" value="" pattern=".{8,15}" type="text" class="form-control" placeholder="Пароль">
+                    <p>
+                        <input name="tip_ip" id="tip_ip_dchp" type="radio" value="dhcp">DCHP
+                    <p>
+                        <input name="tip_ip" id="tip_ip_stat" type="radio" value="static">Статичный
+                    <p>
+                        IP Адрес:
+                        <input id="static_ip1" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_ip2" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_ip3" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_ip4" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">
+                    <p>
+                        MASK:
+                        <input id="static_mask1" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_mask2" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_mask3" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_mask4" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">
+                    <p>
+                        GW :
+                        <input id="static_gw1" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_gw2" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_gw3" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">.
+                        <input id="static_gw4" style="width: 50px" pattern="[0-9]{1,3}" class="form-control">
+                    <p>
+
+                </fieldset>
+                <input class="btn btn-block btn-success" value="Сохранить" onclick="settWiFiCl()" type="submit">
+            </fieldset>
+        </form>
+        <!--<img src="pins.png" />
+
+        -->
+    </body>
+
+</html>

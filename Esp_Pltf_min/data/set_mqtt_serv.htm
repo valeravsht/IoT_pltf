@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="style.css" type="text/css"/>
+
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>ESP Index</title>
+        <style>
+            body {
+                background-color: white;
+                color: black;
+            }
+        </style>
+        <!--   <script src="jquerym.js"></script>-->
+        <!--  <script src="set.js"></script>-->
+        <script type="text/javascript">
+
+
+            var xmlHttp = createXmlHttpObject();
+
+            function onBodyLoad() {
+                console.log("we are loaded!!");
+
+
+                getWiFiServMQTT();
+
+
+
+            }
+            function createXmlHttpObject() {
+                if (window.XMLHttpRequest) {
+                    xmlHttp = new XMLHttpRequest();
+                } else {
+                    xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
+                }
+                return xmlHttp;
+            }
+
+            function getWiFiServMQTT() {
+
+                var requestW5 = createXmlHttpObject();
+                requestW5.open("GET", "/gservmqtt");
+                requestW5.onload = function () {
+                    if (requestW5.readyState === 4) {
+                        var status = requestW5.status;
+                        if (status === 200) {
+                            let jsn = JSON.parse(requestW5.responseText);
+
+                            document.getElementById('mqtt_cl_name').value = jsn.MQTT_Cl_Name;
+                            document.getElementById('mqtt_server').value = jsn.MQTT_Server;
+                            document.getElementById('mqtt_port').value = jsn.MQTT_Port;
+                            document.getElementById('mqtt_login').value = jsn.MQTT_Login;
+                            document.getElementById('mqtt_paswd').value = jsn.MQTT_Paswd;
+
+
+                        } else {
+                            document.write("Ответ сервера " + requestW5.statusText);
+                        }
+                    }
+                };
+                requestW5.send();
+            }
+
+            function setWiFi4() {
+                let mqtt_cl_name = val('mqtt_cl_name');
+                let mqtt_server = val('mqtt_server');
+                let mqtt_port = val('mqtt_port');
+                let mqtt_login = val('mqtt_login');
+                let MQTT_Paswd = val('mqtt_paswd');
+
+
+                let par = `MQTT_Cl_Name=${mqtt_cl_name}&MQTT_Server=${mqtt_server}&`;
+                let par1 = `MQTT_Port=${mqtt_port}&MQTT_Login=${mqtt_login}&MQTT_Paswd=${MQTT_Paswd}`;
+
+                let request = new XMLHttpRequest();
+                request.open("GET", "/sservmqtt?" + par + par1);
+                request.send();
+            }
+            
+            function val(id) {
+                var v = document.getElementById(id).value;
+                return v;
+            }
+
+        </script>
+
+
+
+
+    </head>
+
+    <body id="index" onload="onBodyLoad()">
+        <h1>ESP8266 SET MQTT Server</h1>
+      
+        <form id="frm_wifi" style="font-weight: bold;  width: 50%">
+            <fieldset>
+                <legend>Установки WiFi</legend>
+
+                <fieldset>
+                    <legend>Данные MQTT сервера</legend>
+                    <p>
+                        Имя клиента MQTT :
+                        <input id="mqtt_cl_name" class= "form-control" > </p>
+                    <p>
+                        Имя сервера MQTT :   
+                        <input id="mqtt_server"  type="text" class="form-control" > </p>
+                    <p>
+                        Порт сервера MQTT :   
+                        <input id="mqtt_port" type="text" class="form-control" ></p>
+                    <p>
+                        Login сервера MQTT :   
+                        <input id="mqtt_login" type="text" class="form-control" ></p>
+                    <p>
+                        Pasword сервера MQTT :   
+                        <input id="mqtt_paswd"  type="text" class="form-control" ></p>
+
+
+                </fieldset>    
+
+                <input class="btn btn-block btn-success" value="Сохранить" onclick="setWiFi4()" type="submit">
+            </fieldset>
+        </form>
+        <!--<img src="pins.png" />
+
+        -->
+    </body>
+
+</html>

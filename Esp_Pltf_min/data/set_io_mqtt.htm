@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="style.css" type="text/css"/>
+
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>ESP Index</title>
+        <style>
+            body {
+                background-color: white;
+                color: black;
+            }
+        </style>
+        <!--   <script src="jquerym.js"></script>-->
+        <!--  <script src="set.js"></script> -->
+
+        <script type="text/javascript">
+
+            var xmlHttp = createXmlHttpObject();
+
+            function onBodyLoad() {
+                console.log("we are loaded!!");
+
+                get_io("io5");
+                get_io("io4");
+                get_io("io0");
+                get_io("io2");
+                get_io("io15");
+                get_io("io9");
+                get_io("io10");
+                get_io("io13");
+                get_io("io12");
+                get_io("io14");
+                get_io("io16");
+                get_io("adc");
+
+            }
+            function createXmlHttpObject() {
+                if (window.XMLHttpRequest) {
+                    xmlHttp = new XMLHttpRequest();
+                } else {
+                    xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
+                }
+                return xmlHttp;
+
+            }
+
+            function val(id) {
+                var v = document.getElementById(id).value;
+                return v;
+            }
+
+            function io_rw(obj) {
+                var id = obj.id;
+                var pin = id.slice(0, -2);
+                if (id === pin + '_r') {
+                    var sosed = document.getElementById(pin + '_w');
+                } else {
+                    var sosed = document.getElementById(pin + '_r');
+                }
+                if (obj.checked) {
+                    sosed.checked = false;
+                }
+                if (obj.checked || sosed.checked) {
+                    var edit_mqt = document.getElementById(pin + '_mqtt');
+                    edit_mqt.disabled = false;
+                } else {
+                    var edit_mqt = document.getElementById(pin + '_mqtt');
+                    edit_mqt.disabled = true;
+
+                }
+
+            }
+            function set_io(io) {
+                let r;
+                let w;
+                let mqtt;
+                r = document.getElementById(io + '_r').checked;
+                w = document.getElementById(io + '_w').checked;
+                mqtt = document.getElementById(io + '_mqtt').value;
+                let par = `io=${io}&r=${r}&w=${w}&mqtt=${mqtt}`;
+                let request = new XMLHttpRequest();
+                request.open("GET", "/sio?" + par, false);
+                request.send();
+            }
+            
+            function set_all_io() {
+                set_io("io5");
+                set_io("io4");
+                set_io("io0");
+                set_io("io2");
+                set_io("io15");
+                set_io("io9");
+                set_io("io10");
+                set_io("io13");
+                set_io("io12");
+                set_io("io14");
+                set_io("io16");
+                set_io("adc");
+            }
+            
+            function get_io(io) {
+                var request = new XMLHttpRequest();
+
+                function responceLoad() {
+                    if (request.readyState === 4) {
+                        var status = request.status;
+                        if (status === 200) {
+                            var jsn = JSON.parse(request.responseText);
+                            if (jsn.r) {
+                                document.getElementById(jsn.io + '_r').checked = true;
+                            } else {
+                                document.getElementById(jsn.io + '_r').checked = false;
+                            }
+                            if (jsn.w) {
+                                document.getElementById(jsn.io + '_w').checked = true;
+                            } else {
+                                document.getElementById(jsn.io + '_w').checked = false;
+                            }
+                            document.getElementById(jsn.io + '_mqtt').value = jsn.mqtt;
+                        } else {
+                            document.write("Ответ сервера " + request.statusText);
+                        }
+                    }
+                }
+
+                request.open("GET", "/gio?io=" + io, false);
+                request.onload = responceLoad;
+                request.send();
+            }
+        </script>
+
+
+    </head>
+
+    <body id="index" onload="onBodyLoad();">
+        <h1>ESP8266 Set Pin MQTT</h1>
+       
+        <form id="frm_wifi" style="font-weight: bold;  width: 50%">
+            <fieldset>
+
+                <fieldset>
+                    <legend>Данные MQTT IO</legend>
+                    <p>
+                        IO5 <input name="io5_rw" id="io5_r" type="checkbox" value="io5_r" onclick="io_rw(this)"> R
+                        <input name="io5_rw" id="io5_w" type="checkbox" value="io5_w" onclick="io_rw(this)" > W
+                        <input id="io5_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled" >
+                    </p>
+                    <p>
+                        IO4 <input name="io4_rw" id="io4_r" type="checkbox" value="io4_r" onclick="io_rw(this)"> R
+                        <input name="io4_rw" id="io4_w" type="checkbox" value="io4_w" onclick="io_rw(this)"> W
+                        <input id="io4_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO0 <input name="io0_rw" id="io0_r" type="checkbox" value="io0_r" disabled="disabled" onclick="io_rw(this)">
+                        <font color="gray">	R </font>
+                        <input name="io0_rw" id="io0_w" type="checkbox" value="io0_w"  onclick="io_rw(this)"> W
+                        <input id="io0_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO2 <input name="io2_rw" id="io2_r" type="checkbox" value="io2_r" disabled="disabled" onclick="io_rw(this)">
+                        <font color="gray">	R </font>
+                        <input name="io2_rw" id="io2_w" type="checkbox" value="io2_w"  onclick="io_rw(this)"> W
+                        <input id="io2_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO15 <input name="io15_rw" id="io15_r" type="checkbox" value="io15_r" disabled="disabled" onclick="io_rw(this)">
+                        <font color="gray">	R </font>
+                        <input name="io15_rw" id="io15_w" type="checkbox" value="io15_w"  onclick="io_rw(this)"> W
+                        <input id="io15_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO9 <input name="io9_rw" id="io9_r" type="checkbox" value="io9_r" onclick="io_rw(this)"> R
+                        <input name="io9_rw" id="io9_w" type="checkbox" value="io9_w" onclick="io_rw(this)"> W
+                        <input id="io9_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO10 <input name="io10_rw" id="io10_r" type="checkbox" value="io10_r" onclick="io_rw(this)"> R
+                        <input name="io10_rw" id="io10_w" type="checkbox" value="io10_w" onclick="io_rw(this)"> W
+                        <input id="io10_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO13 <input name="io13_rw" id="io13_r" type="checkbox" value="io13_r" onclick="io_rw(this)"> R
+                        <input name="io13_rw" id="io13_w" type="checkbox" value="io13_w" onclick="io_rw(this)"> W
+                        <input id="io13_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO12 <input name="io12_rw" id="io12_r" type="checkbox" value="io12_r" onclick="io_rw(this)"> R
+                        <input name="io12_rw" id="io12_w" type="checkbox" value="io12_w" onclick="io_rw(this)"> W
+                        <input id="io12_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO14 <input name="io14_rw" id="io14_r" type="checkbox" value="io14_r" onclick="io_rw(this)"> R
+                        <input name="io14_rw" id="io14_w" type="checkbox" value="io14_w" onclick="io_rw(this)"> W
+                        <input id="io14_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+                    <p>
+                        IO16 <input name="io16_rw" id="io16_r" type="checkbox" value="io16_r" onclick="io_rw(this)"> R
+                        <input name="io16_rw" id="io16_w" type="checkbox" value="io16_w" onclick="io_rw(this)"> W
+                        <input id="io16_mqtt" style="width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+
+                    <p>
+                        ADC <input name="adc_rw" id="adc_r" type="checkbox" value="adc_r" onclick="io_rw(this)"> R             
+                        <input name="adc_rw" id="adc_w" type="checkbox" value="adc_w" onclick="io_rw(this)" hidden="hidden" disabled="disabled"> 
+                        <input id="adc_mqtt" style=" width: 250px" class="form-control" size="75" disabled="disabled">
+                    </p>
+
+                </fieldset>
+                <input class="btn btn-block btn-success" value="Сохранить" onclick="set_all_io()" type="submit">
+            </fieldset>
+        </form>
+        <!--<img src="pins.png" />
+
+        -->
+    </body>
+
+</html>

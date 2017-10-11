@@ -1,10 +1,63 @@
 <!DOCTYPE html>
 <html lang="ru">
- <head>
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <title>ESP Monitor</title>
- </head>
- <body>
- <a href= "setup.htm"> setup </a> 
- </body>
- </html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>ESP Monitor</title>
+        <script type="text/javascript">
+            var xmlHttp = createXmlHttpObject();
+
+            function onBodyLoad() {
+                console.log("we are loaded!!");
+                getMac();
+
+
+            }
+
+            function createXmlHttpObject() {
+                if (window.XMLHttpRequest) {
+                    xmlHttp = new XMLHttpRequest();
+                } else {
+                    xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
+                }
+                return xmlHttp;
+            }
+
+            function getMac() {
+                var requestW1 = createXmlHttpObject();
+
+                function responceLoad() {
+                    if (requestW1.readyState === 4) {
+                        var status = requestW1.status;
+                        if (status === 200) {
+                            let jsn = JSON.parse(requestW1.responseText);
+                            var mard = document.getElementById('macadress');
+                            mard.value = jsn.Mac;
+
+
+                        } else {
+                            document.write("Ответ сервера " + request.statusText);
+                        }
+                    }
+                }
+
+                requestW1.open("GET", "/get_sta");
+                requestW1.onload = responceLoad;
+                requestW1.send();
+            }
+            function val(id) {
+                var v = document.getElementById(id).value;
+                return v;
+            }
+
+        </script>
+    </head>
+    <body id="index" onload="onBodyLoad()">
+        <h1>ESP8266 </h1>
+        <p> MAC: <input id="macadress" style=" width: 150px" readonly>
+
+        <p>    <a href= "set_cl_wifi.htm"> setup Клиент WiFi </a> </p>
+        <p>    <a href= "set_ap_wifi.htm"> setup Точки Доступа WiFi </a>  </p>
+        <p>    <a href= "set_mqtt_serv.htm"> setup MQTT Сервер </a>  </p>
+        <p>   <a href= "set_io_mqtt.htm"> setup IO MQTT </a>  </p>
+    </body>
+</html>

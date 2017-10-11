@@ -227,8 +227,7 @@ function getWiFi5() {
             var status = requestW5.status;
             if (status === 200) {
                 let jsn = JSON.parse(requestW5.responseText);
-                var mard = document.getElementById('staticAP_mask3');
-                mard.value = jsn.staticAP_mask3;
+             
                 document.getElementById('mqtt_cl_name').value = jsn.MQTT_Cl_Name;
                 document.getElementById('mqtt_server').value = jsn.MQTT_Server;
                 document.getElementById('mqtt_port').value = jsn.MQTT_Port;

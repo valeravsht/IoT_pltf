@@ -1,4 +1,4 @@
-bool loadConfig1() {
+bool loadConfigWiFiCl1() {
   /*  File configFile = SPIFFS.open("/config.json", "r");
     if (!configFile) {
       Serial.println("Failed to open config file");
@@ -6,14 +6,14 @@ bool loadConfig1() {
     }*/
   File configFile ;
   String fileName;
-  fileName = "/conf1.jsn";
+  fileName = "/confWiFiCl1.json";
 
   if (SPIFFS.exists(fileName)) {
     configFile = SPIFFS.open(fileName, "r");
     //  Serial.println("Config file 1 exists ");
   } else {
     Serial.print("Reset config 1 - ");
-    if (defConfigFile1()) {
+    if (defConfigWiFiCl1()) {
       Serial.println("OK");
     } else {
       Serial.println("BAD !!!!!!!!!!!!!!!!");
@@ -53,10 +53,10 @@ bool loadConfig1() {
   }
 
 
-  if ( json["tip_wifi"] == "AP") {
-    wifi_AP = true;
+  if ( json["wifi_Cl"] == 1) {
+    wifi_Cl = true;
   } else {
-    wifi_AP = false;
+    wifi_Cl = false;
   }
 
 
@@ -67,7 +67,7 @@ bool loadConfig1() {
   return true;
 }
 
-bool loadConfig2() {
+bool loadConfigWiFiCl2() {
   /*  File configFile = SPIFFS.open("/config.json", "r");
     if (!configFile) {
       Serial.println("Failed to open config file");
@@ -75,14 +75,14 @@ bool loadConfig2() {
     }*/
   File configFile ;
   String fileName;
-  fileName = "/conf2.jsn";
+  fileName = "/confWiFiCl2.json";
 
   if (SPIFFS.exists(fileName)) {
     configFile = SPIFFS.open(fileName, "r");
     //   Serial.println("Config file 2 exists ");
   } else {
     Serial.print("Reset config 2 - ");
-    if (defConfigFile2()) {
+    if (defConfigWiFiCl2()) {
       Serial.println("OK");
     } else {
       Serial.println("BAD !!!!!!!!!!!!!!!!");
@@ -131,7 +131,7 @@ bool loadConfig2() {
 }
 
 
-bool loadConfig3() {
+bool loadConfigAP() {
   /*  File configFile = SPIFFS.open("/config.json", "r");
     if (!configFile) {
       Serial.println("Failed to open config file");
@@ -139,20 +139,20 @@ bool loadConfig3() {
     }*/
   File configFile ;
   String fileName;
-  fileName = "/conf3.jsn";
+  fileName = "/confWiFiAP.json";
 
-  if (SPIFFS.exists("/conf3.jsn")) {
-    configFile = SPIFFS.open("/conf3.jsn", "r");
+  if (SPIFFS.exists(fileName)) {
+    configFile = SPIFFS.open(fileName, "r");
     //   Serial.println("Config file 3 exists ");
   } else {
     Serial.print("Reset config 3  ");
-    if (defConfigFile3()) {
+    if (defConfigAP()) {
       Serial.println("OK");
     } else {
       Serial.println("BAD !!!!!!!!!!!!!!!!");
     }
 
-    configFile = SPIFFS.open("/conf3.jsn", "r");
+    configFile = SPIFFS.open(fileName, "r");
   }
   size_t size = configFile.size();
   if (size > 1024) {
@@ -190,30 +190,33 @@ bool loadConfig3() {
   staticAPGw3 = ( byte)json["staticAP_gw3"];
   staticAPGw4 = ( byte)json["staticAP_gw4"];
 
+
+  if ( json["wifi_AP"] == 1) {
+    wifi_AP = true;
+  } else {
+    wifi_AP = false;
+  }
   return true;
 }
 
 
-bool loadConfig4() {
-  /*  File configFile = SPIFFS.open("/config.json", "r");
-    if (!configFile) {
-      Serial.println("Failed to open config file");
-      return false;
-    }*/
+bool loadConfigServMQTT() {
   File configFile ;
+  String fileName;
+  fileName = "/confServMQTT.json";
 
-  if (SPIFFS.exists("/conf4.jsn")) {
-    configFile = SPIFFS.open("/conf4.jsn", "r");
+  if (SPIFFS.exists(fileName)) {
+    configFile = SPIFFS.open(fileName, "r");
     //    Serial.println("Config file 3 exists ");
   } else {
     Serial.print("Reset config 4  ");
-    if (defConfigFile4()) {
+    if (defConfigServMQTT()) {
       Serial.println("OK");
     } else {
       Serial.println("BAD !!!!!!!!!!!!!!!!");
     }
 
-    configFile = SPIFFS.open("/conf4.jsn", "r");
+    configFile = SPIFFS.open(fileName, "r");
   }
   size_t size = configFile.size();
   if (size > 1024) {
@@ -246,15 +249,14 @@ bool loadConfig4() {
 
 
 
-bool saveConfig1() {
+bool saveConfigWiFiCl1() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
-  if (wifi_AP) {
-    root["tip_wifi"] = "AP"; //точка доступа
-  } else
-  {
-    root["tip_wifi"] = "Client"; //точка доступа
+  if (wifi_Cl) {
+    root["wifi_Cl"] = "1"; //
+  } else {
+    root["wifi_Cl"] = "0"; //
   }
   root["ssid"] = ssid;
   root["password"] = password;
@@ -270,9 +272,9 @@ bool saveConfig1() {
 
 
 
-  SPIFFS.remove("/conf1.jsn");
+  SPIFFS.remove("/confWiFiCl1.json");
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/conf1.jsn", "w");
+  File configFile =  SPIFFS.open("/confWiFiCl1.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -280,16 +282,17 @@ bool saveConfig1() {
 
   root.printTo(configFile);
   Serial.println("");
-  Serial.println("Config1");
+  Serial.println("confWiFiCl1.json");
 
   root.printTo(Serial);
   configFile.close();
   return true;
 }
 
-bool saveConfig2() {
+bool saveConfigWiFiCl2() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
+
 
   root["static_ip1"] = staticIP1;
   root["static_ip2"] = staticIP2;
@@ -308,10 +311,10 @@ bool saveConfig2() {
 
 
 
-  SPIFFS.remove("/conf2.jsn");
+  SPIFFS.remove("/confWiFiCl2.json");
 
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/conf2.jsn", "w");
+  File configFile =  SPIFFS.open("/confWiFiCl2.jsonn", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -319,16 +322,20 @@ bool saveConfig2() {
 
   root.printTo(configFile);
   Serial.println("");
-  Serial.println("Config2");
+  Serial.println("confWiFiCl1.json");
   root.printTo(Serial);
   configFile.close();
   return true;
 }
 
-bool saveConfig3() {
+bool saveConfigAP() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
+  
 
+  root["ssidAP"] = ssidAP;
+  root["passwordAP"] = passwordAP;
+  
   root["staticAP_ip1"] = staticAPIP1;
   root["staticAP_ip2"] = staticAPIP2;
   root["staticAP_ip3"] = staticAPIP3;
@@ -344,10 +351,10 @@ bool saveConfig3() {
   root["staticAP_gw3"] = staticAPGw3;
   root["staticAP_gw4"] = staticAPGw4;
 
-  SPIFFS.remove("/conf3.jsn");
+  SPIFFS.remove("/confWiFiAP.json");
 
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/conf3.jsn", "w");
+  File configFile =  SPIFFS.open("/confWiFiAP.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -355,16 +362,17 @@ bool saveConfig3() {
 
   root.printTo(configFile);
   Serial.println("");
-  Serial.println("Config3");
+  Serial.println("confWiFiAP.json");
   root.printTo(Serial);
   configFile.close();
   return true;
 }
 
 
-bool saveConfig4() {
+bool saveConfigServMQTT() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
+  Serial.println(" to open config file for writing");
 
   root["MQTT_Cl_Name"] = MqttClName.c_str();
   root["MQTT_Server"] = MqttServer.c_str();
@@ -373,10 +381,10 @@ bool saveConfig4() {
   root["MQTT_Paswd"] = MqttPaswd.c_str();
 
 
-  SPIFFS.remove("/conf4.jsn");
+  SPIFFS.remove("/confServMQTT.json");
 
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/conf4.jsn", "w");
+  File configFile =  SPIFFS.open("/confServMQTT.json", "w");
   if (!configFile) {
     //  Serial.println("Failed to open config file for writing");
     return false;
@@ -384,14 +392,14 @@ bool saveConfig4() {
 
   root.printTo(configFile);
   Serial.println("");
-  Serial.println("Config4");
+  Serial.println("confServMQTT.json");
   root.printTo(Serial);
   configFile.close();
   return true;
 }
 
 
-bool defConfigFile1() {
+bool defConfigWiFiCl1() {
   /*
       создание файла с настройками WiFi по умолчанию
   */
@@ -399,9 +407,9 @@ bool defConfigFile1() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
 
-  root["tip_wifi"] = "AP"; //точка доступа
-  root["ssid"] = "";
-  root["password"] = "";
+  root["wifi_Cl"] = "1"; //точка доступа
+  root["ssid"] = "shintorg1";
+  root["password"] = "qwerty123";
   root["tip_ip"] = "DCHP";
   String MAC = WiFi.macAddress();
   String tmp = "vlr_dev_";
@@ -409,14 +417,14 @@ bool defConfigFile1() {
   tmp += MAC.substring(12, 14);
   tmp += MAC.substring(15, 17);
 
-  root["ssidAP"] = tmp.c_str();
-  root["passwordAP"] = "12345678";
+  //root["ssidAP"] = tmp.c_str();
+  //root["passwordAP"] = "12345678";
 
 
 
-  SPIFFS.remove("/conf1.jsn");
+  SPIFFS.remove("/confWiFiCl1.json");
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/conf1.jsn", "w");
+  File configFile =  SPIFFS.open("/confWiFiCl1.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -428,7 +436,7 @@ bool defConfigFile1() {
 }
 
 
-bool defConfigFile2() {
+bool defConfigWiFiCl2() {
   /*
       создание файла с настройками WiFi по умолчанию
   */
@@ -451,9 +459,9 @@ bool defConfigFile2() {
   root["static_gw3"] = ( byte)0;
   root["static_gw4"] = ( byte)0;
 
-  SPIFFS.remove("/conf2.jsn");
+  SPIFFS.remove("/confWiFiCl2.json");
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/conf2.jsn", "w");
+  File configFile =  SPIFFS.open("/confWiFiCl2.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -465,7 +473,7 @@ bool defConfigFile2() {
 }
 
 
-bool defConfigFile3() {
+bool defConfigAP() {
   /*
       создание файла с настройками WiFi по умолчанию
   */
@@ -474,6 +482,14 @@ bool defConfigFile3() {
   JsonObject& root = jsonBuffer.createObject();
 
   String tmpMac =  WiFi.macAddress();
+
+String MAC = WiFi.macAddress();
+  String tmp = "dev_";//
+  tmp += MAC.substring(9, 11);
+  tmp += MAC.substring(12, 14);
+  tmp += MAC.substring(15, 17);
+  root["ssidAP"] = ssidAP;
+  root["passwordAP"] = "12345678";
 
   root["staticAP_ip1"] = ( byte)192;
   root["staticAP_ip2"] = ( byte)168;
@@ -487,10 +503,12 @@ bool defConfigFile3() {
   root["staticAP_gw2"] = ( byte)168;
   root["staticAP_gw3"] = ( byte)0;
   root["staticAP_gw4"] = ( byte) 1;
+  
+   root["wifi_AP"] = ( byte)0;
 
-  SPIFFS.remove("/conf3.jsn");
+  SPIFFS.remove("/confWiFiAP.jso");
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/conf3.jsn", "w");
+  File configFile =  SPIFFS.open("/confWiFiAP.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -502,7 +520,7 @@ bool defConfigFile3() {
 }
 
 
-bool defConfigFile4() {
+bool defConfigServMQTT() {
   /*
       создание файла с настройками MQTT по умолчанию
   */
@@ -511,7 +529,7 @@ bool defConfigFile4() {
   JsonObject& root = jsonBuffer.createObject();
 
   String MAC = WiFi.macAddress();
-  String tmp = "AirCons";//Air_curtain_console Пульт тепловой завесы
+  String tmp = "dev_";//Air_curtain_console Пульт тепловой завесы
   tmp += MAC.substring(9, 11);
   tmp += MAC.substring(12, 14);
   tmp += MAC.substring(15, 17);
@@ -523,9 +541,9 @@ bool defConfigFile4() {
   root["MQTT_Paswd"] = "";
 
 
-  SPIFFS.remove("/conf4.jsn");
+  SPIFFS.remove("/confServMQTT.json");
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/conf4.jsn", "w");
+  File configFile =  SPIFFS.open("/confServMQTT.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -581,7 +599,7 @@ int get_i_set_mqtt(String io) {
   //возвращает номер в массиве  настроек io
 
   for (int i = 0; i <= 12 ; i++ ) {
-       if (set_mqtt[i].io == io) {
+    if (set_mqtt[i].io == io) {
       return i;
     }
   }
@@ -604,9 +622,9 @@ bool defConfigMqttIO(String io) {
 
 
 
-  SPIFFS.remove("/cnf" + io + ".jsn");
+  SPIFFS.remove("/cnf" + io + ".json");
   // File configFile = SPIFFS.open("/config.json", "w");
-  File configFile =  SPIFFS.open("/cnf" + io + ".jsn", "w");
+  File configFile =  SPIFFS.open("/cnf" + io + ".json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -622,8 +640,8 @@ bool loadConfigMqttIO(String io) {
 
   File configFile ;
 
-  if (SPIFFS.exists("/cnf" + io + ".jsn")) {
-    configFile = SPIFFS.open("/cnf" + io + ".jsn", "r");
+  if (SPIFFS.exists("/cnf" + io + ".json")) {
+    configFile = SPIFFS.open("/cnf" + io + ".json", "r");
     //  Serial.println("Config file 3 exists ");
   } else {
     Serial.print("Reset config 4  ");
@@ -633,7 +651,7 @@ bool loadConfigMqttIO(String io) {
       Serial.println("BAD !!!!!!!!!!!!!!!!");
     }
 
-    configFile = SPIFFS.open("/cnf" + io + ".jsn", "r");
+    configFile = SPIFFS.open("/cnf" + io + ".json", "r");
   }
   size_t size = configFile.size();
   if (size > 1024) {
@@ -686,9 +704,9 @@ bool saveConfigMqttIO(String io) {
   root["mqtt"] = set_mqtt[i].mqtt.c_str();
 
 
-  SPIFFS.remove("/cnf" + io + ".jsn");
+  SPIFFS.remove("/cnf" + io + ".json");
 
-  File configFile =  SPIFFS.open("/cnf" + io + ".jsn", "w");
+  File configFile =  SPIFFS.open("/cnf" + io + ".json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -696,7 +714,7 @@ bool saveConfigMqttIO(String io) {
 
   root.printTo(configFile);
   Serial.println("");
-  Serial.println("/cnf" + io + ".jsn");
+  Serial.println("/cnf" + io + ".json");
   root.printTo(Serial);
   configFile.close();
   return true;
